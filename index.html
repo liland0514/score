@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>使用者列表</title>
+</head>
+<body>
+  <h1>使用者列表</h1>
+  <ul id="user-list"></ul>
+
+  <script>
+    // 從 Node.js API 取得資料
+    fetch("http://localhost:3000/users")
+      .then(res => res.json())
+      .then(data => {
+        const ul = document.getElementById("user-list");
+        data.forEach(user => {
+          const li = document.createElement("li");
+          li.textContent = `${user.id}: ${user.name} (${user.email})`;
+          ul.appendChild(li);
+        });
+      })
+      .catch(err => console.error("Fetch 錯誤:", err));
+  </script>
+</body>
+</html>
