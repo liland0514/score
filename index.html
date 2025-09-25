@@ -1,26 +1,55 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>使用者列表</title>
-</head>
-<body>
-  <h1>使用者列表</h1>
-  <ul id="user-list"></ul>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CRUD 測試</title>
+  </head>
+  <body>
+    <h1>CRUD 測試</h1>
 
-  <script>
-    // 從 Node.js API 取得資料
-    fetch("http://localhost:3000/users")
-      .then(res => res.json())
-      .then(data => {
-        const ul = document.getElementById("user-list");
-        data.forEach(user => {
-          const li = document.createElement("li");
-          li.textContent = `${user.id}: ${user.name} (${user.email})`;
-          ul.appendChild(li);
+    <!-- 讀取資料 -->
+    <button onclick="getUsers()">讀取資料</button>
+
+    <!-- 新增資料（輸入框 + 按鈕） -->
+    <h3>新增使用者</h3>
+    <input id="nameInput" type="text" placeholder="輸入姓名" />
+    <input id="emailInput" type="email" placeholder="輸入 Email" />
+    <input id="passwordInput" type="password" placeholder="輸入密碼" />
+    <input id="phoneInput" type="text" placeholder="輸入電話" />
+    <button onclick="createUser()">送出</button>
+
+    <hr />
+    <pre id="output"></pre>
+
+    <script>
+      const apiUrl = "http://localhost:3000/users";
+
+      // 讀取資料
+      async function getUsers() {
+        const res = await fetch(apiUrl);
+        document.getElementById("output").textContent = await res.text();
+      }
+
+      // 新增資料
+      async function createUser() {
+        const name = document.getElementById("nameInput").value;
+        const email = document.getElementById("emailInput").value;
+        const password = document.getElementById("passwordInput").value;
+        const phone = document.getElementById("phoneInput").value;
+
+        if (!name || !email || !password || !phone) {
+          alert("請完整填寫所有欄位！");
+          return;
+        }
+
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password, phone }),
         });
-      })
-      .catch(err => console.error("Fetch 錯誤:", err));
-  </script>
-</body>
+
+        document.getElementById("output").textContent = await res.text();
+      }
+    </script>
+  </body>
 </html>
