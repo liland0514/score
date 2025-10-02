@@ -2,54 +2,109 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>CRUD 測試</title>
+    <script src="jQuery.js"></script>
+    <link href="datatables.min.css" rel="stylesheet" />
+    <script src="datatables.min.js"></script>
+
+    <title>成績</title>
   </head>
   <body>
-    <h1>CRUD 測試</h1>
+    <div style="width: 90%; margin: 0 auto">
+      <h1>成績</h1>
+      <h3>輸入成績</h3>
+      <input
+        id="nameInput"
+        type="text"
+        placeholder="輸入姓名"
+        maxlength="5"
+        required
+      />
+      <input
+        id="sidInput"
+        type="text"
+        placeholder="輸入學號"
+        pattern="[A-Z0-9]+"
+        maxlength="8"
+        title="只能輸入大寫英文和數字"
+        required
+      />
+      <input
+        id="mscoreInput"
+        type="text"
+        pattern=""
+        placeholder="輸入期中"
+        maxlength="3"
+        style="width: 55px"
+        required
+      />
+      <input
+        id="escoreInput"
+        type="text"
+        maxlength="3"
+        placeholder="輸入期末"
+        style="width: 55px"
+        required
+      />
+      <input
+        id="usualInput"
+        type="text"
+        maxlength="3"
+        placeholder="輸入平時"
+        style="width: 55px"
+        required
+      />
+      <button onclick="createUser()">送出</button>
+    </div>
 
-    <!-- 讀取資料 -->
-    <button onclick="getUsers()">讀取資料</button>
-
-    <!-- 新增資料（輸入框 + 按鈕） -->
-    <h3>新增使用者</h3>
-    <input id="nameInput" type="text" placeholder="輸入姓名" />
-    <input id="emailInput" type="email" placeholder="輸入 Email" />
-    <input id="passwordInput" type="password" placeholder="輸入密碼" />
-    <input id="phoneInput" type="text" placeholder="輸入電話" />
-    <button onclick="createUser()">送出</button>
-
-    <hr />
-    <pre id="output"></pre>
+    <div style="width: 90%; border: 1px solid; margin: 20px auto 0 auto">
+      <table id="example"></table>
+    </div>
 
     <script>
       const apiUrl = "http://localhost:3000/users";
 
-      // 讀取資料
-      async function getUsers() {
-        const res = await fetch(apiUrl);
-        document.getElementById("output").textContent = await res.text();
-      }
-
       // 新增資料
       async function createUser() {
         const name = document.getElementById("nameInput").value;
-        const email = document.getElementById("emailInput").value;
-        const password = document.getElementById("passwordInput").value;
-        const phone = document.getElementById("phoneInput").value;
-
-        if (!name || !email || !password || !phone) {
-          alert("請完整填寫所有欄位！");
-          return;
-        }
+        const sid = document.getElementById("sidInput").value;
+        const mscore = document.getElementById("mscoreInput").value;
+        const escore = document.getElementById("escoreInput").value;
+        const usual = document.getElementById("usualInput").value;
 
         const res = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password, phone }),
+          body: JSON.stringify({ name, mscore, escore, usual, sid }),
         });
-
-        document.getElementById("output").textContent = await res.text();
+        location.reload();
       }
+
+      $(document).ready(function () {
+        $("#example").DataTable({
+          ajax: { url: "http://localhost:3000/users", dataSrc: "" },
+
+          columns: [
+            { data: "id", title: "ID" },
+            { data: "name", title: "Name" },
+            { data: "sid", title: "SID" },
+            { data: "mscore", title: "MScore" },
+            { data: "escore", title: "EScore" },
+            { data: "usual", title: "Usual" },
+
+            {
+              data: null,
+              title: "Total Score",
+              render: function (data, type, row) {
+                return (
+                  row.mscore * 0.15 +
+                  row.escore * 0.3 +
+                  row.usual * 0.45
+                ).toFixed(2);
+              },
+            },
+          ],
+        });
+      });
     </script>
   </body>
 </html>
